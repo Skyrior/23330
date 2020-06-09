@@ -2,6 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(numDeriv)
 library(dfoptim)
+library(lubridate)
 
 beta <- 0.0925
 v <- 0.1826
@@ -825,7 +826,7 @@ data.gov <- data.gov %>%
 
 tutil.gov <- sum(data.gov$tu)
 
-ggplot(data.gov, aes(x = t, y = govresults.i)) +
+ggplot(data.gov, aes(x = t, y = govresults.cs)) +
   geom_line(color = "#69b3a2", size = 2, alpha = 0.9) +
   theme_dark()+
   ggtitle("Trajectory of Disease Prevalence under decentralized decision making") +
@@ -1046,10 +1047,17 @@ data.soc3 <- data.soc3 %>%
 
 tutil.soc3 <- sum(data.soc3$tu)
 
-ggplot(data.soc3, aes(x = t, y = soc3results.uz)) +
+ggplot(data.soc3, aes(x = t, y = soc3results.s)) +
   geom_line(color = "#69b3a2", size = 2, alpha = 0.9) +
   theme_dark()+
   ggtitle("Trajectory of Disease Prevalence under decentralized decision making") +
+  xlab("Time (days)") +
+  ylab("Disease Prevalence (%)")
+
+ggplot(data.soc3, aes(x = t, y = soc3results.s)) +
+  geom_line(color = "#69b3a2", size = 2, alpha = 0.9) +
+  theme_dark()+
+  ggtitle("Trajectory of Contacts under different decision making frameworks") +
   xlab("Time (days)") +
   ylab("Disease Prevalence (%)")
 
@@ -2821,3 +2829,260 @@ ggplot(data.soc3cov1, aes(x = t, y = soc3covid1.s)) +
   ggtitle("Trajectory of Disease Prevalence under decentralized decision making") +
   xlab("Time (days)") +
   ylab("Disease Prevalence (%)")
+
+
+## -------------------------------------------------------
+##
+## PLOTS
+##
+## -------------------------------------------------------
+
+## base replication: trajectory of contacts
+
+theme_set(theme_bw())
+
+ggplot(data.decentralized, aes(x=t)) +
+  geom_line(aes(y=decentralizedresults.cs, col = "Contacts (Sus), Decentralized"), size = 1) +
+  geom_line(aes(y=govresults.cs, col = "Contacts, Government"), data = data.gov, size = 1) +
+  geom_line(aes(y=soc3results.cs, col = "Contacts (Sus), Soc Planner (3+)"), data = data.soc3, size = 1) +
+  geom_line(aes(y=soc3results.ci, col = "Contacts (Inf), Soc Planner (3+)"), data = data.soc3, size = 1) +
+  geom_line(aes(y=soc3results.cz, col = "Contacts (Rec), Soc Planner (3+)"), data = data.soc3, size = 1) +
+  labs(title = "Contact Level of Individuals in different decision making frameworks",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.decentralized, aes(x=t)) +
+  geom_line(aes(y=decentralizedresults.i, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=govresults.i, col = "Government"), data = data.gov, size = 1) +
+  geom_line(aes(y=socresults.i, col = "Social Planner"), data = data.soc, size = 1) +
+  geom_line(aes(y=soc3results.i, col = "Soc Planner (3+)"), data = data.soc3, size = 1) +
+  labs(title = "Disease prevalence in different decision making frameworks",
+       y = "Disease prevalence",
+       x = "Time (Days)")
+
+ggplot(data.decentralized, aes(x=t)) +
+  geom_line(aes(y=decentralizedresults.s, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=govresults.s, col = "Government"), data = data.gov, size = 1) +
+  geom_line(aes(y=socresults.s, col = "Social Planner"), data = data.soc, size = 1) +
+  geom_line(aes(y=soc3results.s, col = "Soc Planner (3+)"), data = data.soc3, size = 1) +
+  labs(title = "Susceptible population in different decision making frameworks",
+       y = "Susceptible population (%)",
+       x = "Time (Days)")
+
+ggplot(data.dc1, aes(x=t)) +
+  geom_line(aes(y=d.c1.cs, col = "Contacts (Sus), Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c1.cs, col = "Contacts, Government"), data = data.govc1, size = 1) +
+  geom_line(aes(y=soc3.c1.cs, col = "Contacts (Sus), Soc Planner (3+)"), data = data.soc3c1, size = 1) +
+  geom_line(aes(y=soc3.c1.ci, col = "Contacts (Inf), Soc Planner (3+)"), data = data.soc3c1, size = 1) +
+  geom_line(aes(y=soc3.c1.cz, col = "Contacts (Rec), Soc Planner (3+)"), data = data.soc3c1, size = 1) +
+  labs(title = "Contact Level of Individuals in different decision making frameworks",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dc1, aes(x=t)) +
+  geom_line(aes(y=d.c1.cs, col = "Contacts (Sus), Dec., Csi = Cs Ci"), size = 1) +
+  geom_line(aes(y=decentralizedresults.cs, col = "Contacts (Sus), Dec., Fenichel"), data = data.decentralized, size = 1) +
+  geom_line(aes(y=govresults.cs, col = "Contacts, Gov, Fenichel"), data = data.gov, size = 1) +
+  geom_line(aes(y=gov.c1.cs, col = "Contacts, Gov, Csi = Cs Ci"), data = data.govc1, size = 1) +
+  labs(title = "Comparison of contact levels depending on contact function",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dc1, aes(x=t)) +
+  geom_line(aes(y=d.c1.i, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c1.i, col = "Government"), data = data.govc1, size = 1) +
+  geom_line(aes(y=s.c1.i, col = "Social Planner"), data = data.sc1, size = 1) +
+  geom_line(aes(y=soc3.c1.i, col = "Soc Planner (3+)"), data = data.soc3c1, size = 1) +
+  labs(title = "Disease prevalence in different decision making frameworks",
+       y = "Disease prevalence",
+       x = "Time (Days)")
+
+ggplot(data.dc1, aes(x=t)) +
+  geom_line(aes(y=d.c1.i, col = "Decentralized, Csi = Cs Ci"), size = 1) +
+  geom_line(aes(y=decentralizedresults.i, col = "Decentralized, Fenichel"), data = data.decentralized, size = 1) +
+  geom_line(aes(y=govresults.i, col = "Government, Fenichel"), data = data.gov, size = 1) +
+  geom_line(aes(y=gov.c1.i, col = "Government, Csi = Cs Ci"), data = data.govc1, size = 1) +
+  geom_line(aes(y=soc3results.i, col = "Soc Planner (3+), Fenichel"), data = data.soc3, size = 1) +
+  geom_line(aes(y=soc3.c1.i, col = "Soc Planner (3+), Csi = Cs Ci"), data = data.soc3c1, size = 1) +
+  labs(title = "Comparison of disease prevalence depending on contact function",
+       y = "Disease prevalence",
+       x = "Time (Days)")
+
+ggplot(data.dc2, aes(x=t)) +
+  geom_line(aes(y=d.c2.cs, col = "Contacts (Sus), Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c2.cs, col = "Contacts, Government"), data = data.govc2, size = 1) +
+  geom_line(aes(y=soc3.c2.cs, col = "Contacts (Sus), Soc Planner (3+)"), data = data.soc3c2, size = 1) +
+  geom_line(aes(y=soc3.c2.ci, col = "Contacts (Inf), Soc Planner (3+)"), data = data.soc3c2, size = 1) +
+  geom_line(aes(y=soc3.c2.cz, col = "Contacts (Rec), Soc Planner (3+)"), data = data.soc3c2, size = 1) +
+  labs(title = "Contact Level of Individuals in different decision making frameworks (digamma = 1)",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dc3, aes(x=t)) +
+  geom_line(aes(y=d.c3.cs, col = "Contacts (Sus), Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c3.cs, col = "Contacts, Government"), data = data.govc3, size = 1) +
+  geom_line(aes(y=soc3.c3.cs, col = "Contacts (Sus), Soc Planner (3+)"), data = data.soc3c3, size = 1) +
+  geom_line(aes(y=soc3.c3.ci, col = "Contacts (Inf), Soc Planner (3+)"), data = data.soc3c3, size = 1) +
+  geom_line(aes(y=soc3.c3.cz, col = "Contacts (Rec), Soc Planner (3+)"), data = data.soc3c3, size = 1) +
+  labs(title = "Contact Level of Individuals in different decision making frameworks (digamma = 1.5)",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dc4, aes(x=t)) +
+  geom_line(aes(y=d.c4.cs, col = "Contacts (Sus), Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c4.cs, col = "Contacts, Government"), data = data.govc4, size = 1) +
+  geom_line(aes(y=soc3.c4.cs, col = "Contacts (Sus), Soc Planner (3+)"), data = data.soc3c4, size = 1) +
+  geom_line(aes(y=soc3.c4.ci, col = "Contacts (Inf), Soc Planner (3+)"), data = data.soc3c4, size = 1) +
+  geom_line(aes(y=soc3.c4.cz, col = "Contacts (Rec), Soc Planner (3+)"), data = data.soc3c4, size = 1) +
+  labs(title = "Contact Level of Individuals in different decision making frameworks (digamma = 2)",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dc2, aes(x=t)) +
+  geom_line(aes(y=d.c2.cs, col = "Contacts, Decentralized, digamma = 1"), size = 1) +
+  geom_line(aes(y=d.c3.cs, col = "Contacts, Decentralized, digamma = 1.5"), data = data.dc3, size = 1) +
+  geom_line(aes(y=d.c4.cs, col = "Contacts, Decentralized, digamma = 2"), data = data.dc4, size = 1) +
+  geom_line(aes(y=d.c1.cs, col = "Contacts, Decentralized, Csi = Cs Ci"), data = data.dc1, size = 1) +
+  labs(title = "Contact Level of Individuals in decentralized economy with different digamma values",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.soc3c2, aes(x=t)) +
+  geom_line(aes(y=soc3.c2.cs, col = "Contacts (Sus), digamma = 1"), size = 1) +
+  geom_line(aes(y=soc3.c3.cs, col = "Contacts (Sus), digamma = 1.5"), data = data.soc3c3, size = 1) +
+  geom_line(aes(y=soc3.c4.cs, col = "Contacts (Sus), digamma = 2"), data = data.soc3c4, size = 1) +
+  geom_line(aes(y=soc3.c2.cz, col = "Contacts (Rec), digamma = 1"), size = 1) +
+  geom_line(aes(y=soc3.c3.cz, col = "Contacts (Rec), digamma = 1.5"), data = data.soc3c3, size = 1) +
+  geom_line(aes(y=soc3.c4.cz, col = "Contacts (Rec), digamma = 2"), data = data.soc3c4, size = 1) +
+  geom_line(aes(y=soc3.c1.cs, col = "Contacts (Sus), Csi = Cs Ci"), data = data.soc3c1, size = 1) +
+  geom_line(aes(y=soc3.c1.cz, col = "Contacts (Rec), Csi = Cs Ci"), data = data.soc3c1, size = 1) +
+  labs(title = "Contact Levels under social planning (min contacts 3) with different digamma values",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dc2, aes(x=t)) +
+  geom_line(aes(y=d.c2.i, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c2.i, col = "Government"), data = data.govc2, size = 1) +
+  geom_line(aes(y=s.c2.i, col = "Social Planner"), data = data.sc2, size = 1) +
+  geom_line(aes(y=soc3.c2.i, col = "Soc Planner (3+)"), data = data.soc3c2, size = 1) +
+  labs(title = "Disease prevalence in different decision making frameworks (digamma = 1)",
+       y = "Disease prevalence",
+       x = "Time (Days)")
+
+ggplot(data.dc4, aes(x=t)) +
+  geom_line(aes(y=d.c4.i, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c4.i, col = "Government"), data = data.govc4, size = 1) +
+  geom_line(aes(y=s.c4.i, col = "Social Planner"), data = data.sc4, size = 1) +
+  geom_line(aes(y=soc3.c4.i, col = "Soc Planner (3+)"), data = data.soc3c4, size = 1) +
+  labs(title = "Disease prevalence in different decision making frameworks (digamma = 2)",
+       y = "Disease prevalence",
+       x = "Time (Days)")
+
+ggplot(data.dc2, aes(x=t)) +
+  geom_line(aes(y=d.c2.s, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c2.s, col = "Government"), data = data.govc2, size = 1) +
+  geom_line(aes(y=s.c2.s, col = "Social Planner"), data = data.sc2, size = 1) +
+  geom_line(aes(y=soc3.c2.s, col = "Soc Planner (3+)"), data = data.soc3c2, size = 1) +
+  labs(title = "Susceptible population in different decision making frameworks (digamma = 1)",
+       y = "Susceptible population",
+       x = "Time (Days)")
+
+ggplot(data.dc4, aes(x=t)) +
+  geom_line(aes(y=d.c4.s, col = "Decentralized"), size = 1) +
+  geom_line(aes(y=gov.c4.s, col = "Government"), data = data.govc4, size = 1) +
+  geom_line(aes(y=s.c4.s, col = "Social Planner"), data = data.sc4, size = 1) +
+  geom_line(aes(y=soc3.c4.s, col = "Soc Planner (3+)"), data = data.soc3c4, size = 1) +
+  labs(title = "Susceptible population in different decision making frameworks (digamma = 2)",
+       y = "Susceptible population",
+       x = "Time (Days)")
+
+ggplot(data.dc2, aes(x=t)) +
+  geom_line(aes(y=d.c2.i, col = "I, Decentralized, digamma = 1"), size = 1) +
+  geom_line(aes(y=d.c3.i, col = "I, Decentralized, digamma = 1.5"), data = data.dc3, size = 1) +
+  geom_line(aes(y=d.c4.i, col = "I, Decentralized, digamma = 2"), data = data.dc4, size = 1) +
+  geom_line(aes(y=d.c1.i, col = "I, Decentralized, Csi = Cs Ci"), data = data.dc1, size = 1) +
+  labs(title = "Disease prevalence in decentralized economy with different digamma values",
+       y = "Disease prevalence (I)",
+       x = "Time (Days)")
+
+ggplot(data.soc3c2, aes(x=t)) +
+  geom_line(aes(y=soc3.c2.i, col = "I, Decentralized, digamma = 1"), size = 1) +
+  geom_line(aes(y=soc3.c3.i, col = "I, Decentralized, digamma = 1.5"), data = data.soc3c3, size = 1) +
+  geom_line(aes(y=soc3.c4.i, col = "I, Decentralized, digamma = 2"), data = data.soc3c4, size = 1) +
+  geom_line(aes(y=soc3.c1.i, col = "I, Decentralized, Csi = Cs Ci"), data = data.soc3c1, size = 1) +
+  labs(title = "Disease prevalence under social planning (min 3 contacts) with different digamma values",
+       y = "Disease prevalence (I)",
+       x = "Time (Days)")
+
+ggplot(data.dc2, aes(x=t)) +
+  geom_line(aes(y=d.c2.i, col = "I, Decentralized, digamma = 1"), size = 1) +
+  geom_line(aes(y=d.c3.i, col = "I, Decentralized, digamma = 1.5"), data = data.dc3, size = 1) +
+  geom_line(aes(y=d.c4.i, col = "I, Decentralized, digamma = 2"), data = data.dc4, size = 1) +
+  geom_line(aes(y=d.c1.i, col = "I, Decentralized, Csi = Cs Ci"), data = data.dc1, size = 1) +
+  labs(title = "Disease prevalence in decentralized economy with different digamma values",
+       y = "Disease prevalence (I)",
+       x = "Time (Days)")
+
+ggplot(data.dcovid1, aes(x=t)) +
+  geom_line(aes(y=dcovid1.cs, col = "Contacts (Sus), Decentralized"), size = 1) +
+  geom_line(aes(y=gov.cov1.cs, col = "Contacts, Government"), data = data.govcovid1, size = 1) +
+  geom_line(aes(y=soc3covid1.cs, col = "Contacts (Sus), Soc Planner (3+)"), data = data.soc3cov1, size = 1) +
+  geom_line(aes(y=soc3covid1.ci, col = "Contacts (Inf), Soc Planner (3+)"), data = data.soc3cov1, size = 1) +
+  geom_line(aes(y=soc3covid1.cz, col = "Contacts (Rec), Soc Planner (3+)"), data = data.soc3cov1, size = 1) +
+  labs(title = "Contact Level of Individuals in different decision making frameworks",
+       caption = "Note: in the decentralized economy, infected and recovered individuals always choose 5.
+       In the social planning economy, the social planner always chooses 0 for infected,
+       and 5 for susceptible and recovered individuals",
+       y = "Contact Level (optimal level of contacts at 5)",
+       x = "Time (Days)")
+
+ggplot(data.dcovid1, aes(x=t)) +
+  geom_line(aes(y=dcovid1.i, col = "I, Decentralized"), size = 1) +
+  geom_line(aes(y=s.cov1.i, col = "I, Social Planner"), data = data.scovid1, size = 1) +
+  geom_line(aes(y=soc3covid1.i, col = "I, Soc Planner (3+)"), data = data.soc3cov1, size = 1) +
+  geom_line(aes(y=gov.cov1.i, col = "I, Government"), data = data.govcovid1, size = 1) +
+  labs(title = "Disease prevalence in different decision making frameworks",
+       y = "Disease prevalence (I)",
+       x = "Time (Days)")
+
+ggplot(data.dcovid1, aes(x=t)) +
+  geom_line(aes(y=dcovid1.s, col = "S, Decentralized"), size = 1) +
+  geom_line(aes(y=s.cov1.s, col = "S, Social Planner"), data = data.scovid1, size = 1) +
+  geom_line(aes(y=soc3covid1.s, col = "S, Soc Planner (3+)"), data = data.soc3cov1, size = 1) +
+  geom_line(aes(y=gov.cov1.s, col = "S, Government"), data = data.govcovid1, size = 1) +
+  labs(title = "Susceptible population in different decision making frameworks",
+       y = "Susceptible population (S)",
+       x = "Time (Days)")
+
+ggplot(data.dcovid1, aes(x=t)) +
+  geom_line(aes(y=dcovid1.d, col = "D, Decentralized"), size = 1) +
+  geom_line(aes(y=s.cov1.d, col = "D, Social Planner"), data = data.scovid1, size = 1) +
+  geom_line(aes(y=soc3covid1.d, col = "D, Soc Planner (3+)"), data = data.soc3cov1, size = 1) +
+  geom_line(aes(y=gov.cov1.d, col = "D, Government"), data = data.govcovid1, size = 1) +
+  labs(title = "Deaths in different decision making frameworks",
+       y = "Deaths (D)",
+       x = "Time (Days)")
